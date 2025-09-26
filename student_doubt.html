@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Doubt Board</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --primary:#2563eb;
+      --secondary:#1e40af;
+      --muted:#555;
+      --bg:#f0f9ff;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      font-family:'Inter',sans-serif;
+      background:var(--bg);
+      color:#222;
+      padding:20px;
+    }
+    header{
+      text-align:center;
+      font-size:28px;
+      font-weight:700;
+      margin-bottom:20px;
+      color:var(--primary);
+    }
+    .container{
+      max-width:900px;
+      margin:0 auto;
+    }
+    .form{
+      display:flex;flex-direction:column;gap:12px;
+      background:#fff;padding:16px;
+      border-radius:12px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom:20px;
+    }
+    select,input,button{
+      font-family:inherit;font-size:14px;
+      padding:10px;border-radius:8px;border:1px solid #ccc;
+    }
+    button{
+      background:linear-gradient(90deg,var(--primary),var(--secondary));
+      color:#fff;font-weight:600;cursor:pointer;border:none;
+    }
+    button:hover{opacity:0.9;}
+    .doubt{
+      background:#fff;
+      border:1px solid #e5e5e5;
+      border-radius:12px;
+      padding:14px;
+      margin-bottom:16px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.05);
+    }
+    .doubt-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+    .username{font-weight:600;color:var(--primary);}
+    .subject{font-size:13px;background:var(--primary);color:#fff;padding:2px 8px;border-radius:6px;}
+    .title{font-weight:600;margin:6px 0;color:#333;}
+    .reactions{display:flex;gap:12px;font-size:16px;}
+    .heart{color:#999;}
+    .thumb{color:#999;}
+    .replies{margin-top:10px;padding-left:10px;border-left:3px solid #eee;display:flex;flex-direction:column;gap:8px;}
+    .reply{background:#f9f9f9;padding:8px;border-radius:8px;font-size:14px;}
+    .reply .meta{font-size:12px;color:var(--muted);margin-bottom:4px;}
+  </style>
+</head>
+<body>
+  <header>🎓 Student Doubt Board</header>
+  <div class="container">
+    <form class="form" onsubmit="postDoubt(event)">
+      <select id="subject" required>
+        <option value="">Select Subject</option>
+        <option>Data Structure (DS)</option>
+        <option>Computer Organization & Architec (COA)</option>
+        <option>Python Programing (PP)</option>
+        <option>Technical Communication (TC)</option>
+        <option>Digital Electronic (DE)</option>
+        <option>Mini Project (MP)</option>
+      </select>
+      <!-- New doubt title input -->
+      <input type="text" id="doubtTitle" placeholder="Enter doubt title..." required>
+      <input type="text" id="doubtInput" placeholder="Write your doubt..." required>
+      <button type="submit">Post Doubt</button>
+    </form>
+    <div id="doubtContainer"></div>
+  </div>
+
+  <script>
+    let doubts = JSON.parse(localStorage.getItem("doubts")||"[]");
+    const currentUser = localStorage.getItem("currentUser") || "Guest";
+
+    function save(){ localStorage.setItem("doubts",JSON.stringify(doubts)); }
+
+    function postDoubt(e){
+      e.preventDefault();
+      const subject=document.getElementById("subject").value;
+      const title=document.getElementById("doubtTitle").value.trim();
+      const text=document.getElementById("doubtInput").value.trim();
+      if(!subject||!title||!text) return;
+      doubts.push({
+        id:Date.now(),
+        username:currentUser,
+        subject,
+        title,
+        text,
+        likes:0,
+        dislikes:0,
+        replies:[]
+      });
+      save();
+      e.target.reset();
+      render();
+    }
+
+    function render(){
+      const container=document.getElementById("doubtContainer");
+      container.innerHTML="";
+      doubts.sort((a,b)=>b.likes-a.likes);
+      doubts.forEach(d=>{
+        const el=document.createElement("div");
+        el.className="doubt";
+        el.innerHTML=`
+          <div class="doubt-header">
+            <div class="username">${d.username}</div>
+            <div class="subject">${d.subject}</div>
+          </div>
+          <div class="title">${d.title}</div>
+          <p>${d.text}</p>
+          <div class="replies">
+            ${d.replies.map(r=>`<div class="reply"><div class="meta">${r.user}</div>${r.text}</div>`).join("")}
+          </div>
+        `;
+        container.appendChild(el);
+      });
+    }
+    render();
+  </script>
+</body>
+</html>
