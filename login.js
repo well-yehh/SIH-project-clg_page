@@ -17,7 +17,7 @@ showstudent.addEventListener('click', function(e) {
 const validUsername = "TEAM FLASH";
 const validPassword = "12345";
 
-const validFaculityname = "FACULITY";
+const validFaculityname = "FACULTY";
 const validFaculitypass = "54321";
 
 // student form submit
@@ -47,3 +47,4 @@ document.getElementById("facultyForm").addEventListener("submit", function(e) {
     alert("Invalid faculty username or password. Try again!");
   }
 });
+
